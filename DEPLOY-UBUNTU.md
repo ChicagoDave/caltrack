@@ -45,8 +45,8 @@ sudo npm install -g pm2
 
 ### 6. Create application directory
 ```bash
-sudo mkdir -p /var/www/caltrack
-sudo chown $USER:$USER /var/www/caltrack
+mkdir -p ~/caltracker
+cd ~/caltracker
 ```
 
 ---
@@ -56,10 +56,10 @@ sudo chown $USER:$USER /var/www/caltrack
 ### 7. Upload files to server
 Using WinSCP:
 1. Connect to ct.plover.net
-2. Navigate to `/var/www/caltrack/`
+2. Navigate to `/home/dave/caltracker/`
 3. Upload these folders:
-   - `dist/` → `/var/www/caltrack/dist/`
-   - `server/` → `/var/www/caltrack/server/`
+   - `dist/` → `/home/dave/caltracker/dist/`
+   - `server/` → `/home/dave/caltracker/server/`
 
 ---
 
@@ -67,13 +67,13 @@ Using WinSCP:
 
 ### 8. Install backend dependencies
 ```bash
-cd /var/www/caltrack/server
+cd ~/caltracker/server
 npm install --production
 ```
 
 ### 9. Create production environment file
 ```bash
-cd /var/www/caltrack/server
+cd ~/caltracker/server
 nano .env
 ```
 
@@ -98,7 +98,7 @@ Save: `Ctrl+O`, `Enter`, `Ctrl+X`
 
 ### 10. Initialize SQLite database
 ```bash
-cd /var/www/caltrack/server
+cd ~/caltracker/server
 npm run init-db
 ```
 
@@ -110,7 +110,7 @@ This creates the database file and pre-populates 4 family users:
 
 ### 11. Test the backend server
 ```bash
-cd /var/www/caltrack/server
+cd ~/caltracker/server
 npm start
 ```
 
@@ -124,7 +124,7 @@ Press `Ctrl+C` to stop the test.
 
 ### 12. Start backend with PM2
 ```bash
-cd /var/www/caltrack/server
+cd ~/caltracker/server
 pm2 start src/index.js --name caltrack-api
 pm2 save
 pm2 startup systemd
@@ -155,9 +155,9 @@ Paste this configuration:
     ServerAdmin admin@plover.net
 
     # Serve static frontend files
-    DocumentRoot /var/www/caltrack/dist
+    DocumentRoot /home/dave/caltracker/dist
 
-    <Directory /var/www/caltrack/dist>
+    <Directory /home/dave/caltracker/dist>
         Options -Indexes +FollowSymLinks
         AllowOverride All
         Require all granted
@@ -222,7 +222,7 @@ You should see the CalTrack login page with 4 family users.
 
 ### 20. Update .env with FatSecret credentials
 ```bash
-cd /var/www/caltrack/server
+cd ~/caltracker/server
 nano .env
 ```
 
@@ -263,7 +263,7 @@ sudo tail -f /var/log/apache2/caltrack-error.log
 
 ### Backup SQLite database
 ```bash
-cp /var/www/caltrack/server/caltrack.db /var/www/caltrack/server/caltrack.db.backup-$(date +%Y%m%d)
+cp ~/caltracker/server/caltrack.db ~/caltracker/server/caltrack.db.backup-$(date +%Y%m%d)
 ```
 
 ### Update the application
@@ -271,10 +271,10 @@ cp /var/www/caltrack/server/caltrack.db /var/www/caltrack/server/caltrack.db.bac
 # Stop backend
 pm2 stop caltrack-api
 
-# Upload new files via WinSCP (dist/ and server/)
+# Upload new files via WinSCP (dist/ and server/ to ~/caltracker/)
 
 # Rebuild backend dependencies (if package.json changed)
-cd /var/www/caltrack/server
+cd ~/caltracker/server
 npm install --production
 
 # Restart backend
@@ -287,10 +287,9 @@ pm2 restart caltrack-api
 
 Ensure proper permissions:
 ```bash
-sudo chown -R $USER:$USER /var/www/caltrack
-sudo chmod -R 755 /var/www/caltrack/dist
-sudo chmod 600 /var/www/caltrack/server/.env
-sudo chmod 644 /var/www/caltrack/server/caltrack.db
+chmod -R 755 ~/caltracker/dist
+chmod 600 ~/caltracker/server/.env
+chmod 644 ~/caltracker/server/caltrack.db
 ```
 
 ---
@@ -299,7 +298,7 @@ sudo chmod 644 /var/www/caltrack/server/caltrack.db
 
 ### Frontend loads but shows blank page
 - Check browser console for errors
-- Verify `/var/www/caltrack/dist/` contains files
+- Verify `~/caltracker/dist/` contains files
 - Check Apache error log: `sudo tail -f /var/log/apache2/caltrack-error.log`
 
 ### API requests fail (login doesn't work)
@@ -308,11 +307,11 @@ sudo chmod 644 /var/www/caltrack/server/caltrack.db
 - Verify Apache proxy is working: `curl http://localhost:3001/api/health`
 
 ### Database errors
-- Verify database exists: `ls -lh /var/www/caltrack/server/caltrack.db`
-- Reinitialize if needed: `cd /var/www/caltrack/server && npm run init-db`
+- Verify database exists: `ls -lh ~/caltracker/server/caltrack.db`
+- Reinitialize if needed: `cd ~/caltracker/server && npm run init-db`
 
 ### Food search doesn't work
-- Verify FatSecret credentials in `/var/www/caltrack/server/.env`
+- Verify FatSecret credentials in `~/caltracker/server/.env`
 - Check backend logs for API errors: `pm2 logs caltrack-api`
 - FatSecret free tier: 10,000 requests/day
 
@@ -330,10 +329,10 @@ sudo chmod 644 /var/www/caltrack/server/caltrack.db
 
 ## Quick Reference
 
-**Frontend**: `/var/www/caltrack/dist/`
-**Backend**: `/var/www/caltrack/server/`
-**Database**: `/var/www/caltrack/server/caltrack.db`
-**Config**: `/var/www/caltrack/server/.env`
+**Frontend**: `~/caltracker/dist/` (`/home/dave/caltracker/dist/`)
+**Backend**: `~/caltracker/server/` (`/home/dave/caltracker/server/`)
+**Database**: `~/caltracker/server/caltrack.db`
+**Config**: `~/caltracker/server/.env`
 **Apache Config**: `/etc/apache2/sites-available/caltrack.conf`
 **Apache Logs**: `/var/log/apache2/caltrack-*.log`
 
