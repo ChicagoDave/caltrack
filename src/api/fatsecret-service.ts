@@ -7,7 +7,7 @@ export class FatSecretFoodService {
   private cache: Map<string, { data: any; timestamp: number }>;
 
   constructor() {
-    this.apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+    this.apiUrl = import.meta.env.VITE_API_URL || '/api';
     this.cache = new Map();
   }
 

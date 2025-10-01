@@ -83,18 +83,17 @@ export class DashboardView {
       <div class="container">
         <!-- Header -->
         <div class="card" style="margin-bottom: 1.5rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div class="dashboard-header">
             <h1 style="font-size: 1.8rem; color: var(--primary); margin: 0;">🥗 CalTrack</h1>
-            <div style="display: flex; align-items: center; gap: 1rem;">
-              <!-- Date Navigation -->
-              <div style="display: flex; align-items: center; gap: 0.5rem; background: var(--light); padding: 0.5rem; border-radius: var(--radius);">
-                <button id="prevDayBtn" style="padding: 0.25rem 0.5rem; background: var(--primary); color: white; border: none; border-radius: var(--radius); font-size: 0.9rem; cursor: pointer; font-weight: bold;">←</button>
-                <div style="font-size: 0.9rem; color: var(--dark); font-weight: 500; min-width: 200px; text-align: center;">${dateStr}</div>
-                <button id="nextDayBtn" style="padding: 0.25rem 0.5rem; background: var(--primary); color: white; border: none; border-radius: var(--radius); font-size: 0.9rem; cursor: pointer; font-weight: bold;">→</button>
-                <button id="todayBtn" style="padding: 0.25rem 0.5rem; background: var(--secondary); color: white; border: none; border-radius: var(--radius); font-size: 0.75rem; cursor: pointer;">Today</button>
-              </div>
-              <button id="logoutBtn" style="padding: 0.25rem 0.75rem; background: var(--danger); color: white; border: none; border-radius: var(--radius); font-size: 0.8rem; cursor: pointer;">Logout</button>
-            </div>
+            <button id="logoutBtn" class="logout-btn-mobile">Logout</button>
+          </div>
+
+          <!-- Date Navigation -->
+          <div class="date-navigation">
+            <button id="prevDayBtn" class="date-nav-btn">←</button>
+            <div class="date-display">${dateStr}</div>
+            <button id="nextDayBtn" class="date-nav-btn">→</button>
+            <button id="todayBtn" class="today-btn">Today</button>
           </div>
 
           <!-- Daily Summary Grid -->

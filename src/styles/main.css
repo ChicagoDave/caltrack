@@ -226,6 +226,68 @@ button:hover {
     }
 }
 
+/* Dashboard Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.logout-btn-mobile {
+    padding: 0.25rem 0.75rem;
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+/* Date Navigation */
+.date-navigation {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--light);
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.date-nav-btn {
+    padding: 0.25rem 0.5rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.date-display {
+    font-size: 0.9rem;
+    color: var(--dark);
+    font-weight: 500;
+    text-align: center;
+    flex: 1;
+    min-width: 0;
+}
+
+.today-btn {
+    padding: 0.25rem 0.5rem;
+    background: var(--secondary);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.75rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
 /* Mobile responsive layout */
 @media (max-width: 767px) {
     .summary-grid {
@@ -238,6 +300,17 @@ button:hover {
 
     .form-row {
         grid-template-columns: 1fr;
+    }
+
+    .date-display {
+        font-size: 0.8rem;
+        flex: 1 1 100%;
+        order: 3;
+        margin-top: 0.25rem;
+    }
+
+    .date-navigation {
+        justify-content: center;
     }
 }
 
