@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4CAF50">
+    <title>CalTrack - Calorie & Activity Tracker</title>
+    
+    <style>
+        /* CSS Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --secondary: #2196F3;
+            --danger: #f44336;
+            --warning: #ff9800;
+            --success: #4CAF50;
+            --dark: #212121;
+            --light: #f5f5f5;
+            --gray: #757575;
+            --border: #e0e0e0;
+            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 12px rgba(0,0,0,0.15);
+            --radius: 8px;
+            --radius-lg: 12px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .date-display {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        /* Daily Summary Card */
+        .daily-summary {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-item {
+            text-align: center;
+            padding: 1rem;
+            background: var(--light);
+            border-radius: var(--radius);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .summary-item.burned::before {
+            background: var(--warning);
+        }
+
+        .summary-item.net::before {
+            background: var(--secondary);
+        }
+
+        .summary-item.goal::before {
+            background: var(--success);
+        }
+
+        .summary-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .summary-unit {
+            font-size: 0.8rem;
+            color: var(--gray);
+            font-weight: normal;
+        }
+
+        /* Progress Ring */
+        .progress-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .progress-ring {
+            width: 120px;
+            height: 120px;
+            position: relative;
+        }
+
+        .progress-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            stroke-dasharray: 377;
+            stroke-dashoffset: 377;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .progress-percent {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .progress-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        /* Search Section */
+        .search-section {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .search-bar {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 3rem 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        /* Quick Add Buttons */
+        .quick-add-section {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .quick-add-btn {
+            flex-shrink: 0;
+            padding: 0.5rem 1rem;
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-add-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Entries List */
+        .entries-section {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .entry-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: var(--light);
+            border-radius: var(--radius);
+            transition: transform 0.2s;
+        }
+
+        .entry-item:hover {
+            transform: translateX(5px);
+        }
+
+        .entry-info {
+            flex: 1;
+        }
+
+        .entry-name {
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .entry-details {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        .entry-calories {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .entry-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .icon-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Goals Section */
+        .goals-section {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .weight-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .weight-card {
+            padding: 1rem;
+            background: var(--light);
+            border-radius: var(--radius);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .weight-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .weight-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .weight-value {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .weight-unit {
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        /* Chart Section */
+        .chart-section {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin-top: 1rem;
+        }
+
+        /* Floating Action Button */
+        .fab-container {
+            position: fixed;
+            bottom: 90px;
+            right: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .fab {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .fab-main {
+            background: var(--primary);
+        }
+
+        .fab-food {
+            background: var(--secondary);
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        .fab-activity {
+            background: var(--warning);
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        .fab-weight {
+            background: var(--danger);
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        .fab-container.open .fab-food,
+        .fab-container.open .fab-activity,
+        .fab-container.open .fab-weight {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0;
+        }
+
+        .nav-item {
+            flex: 1;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--gray);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-label {
+            font-size: 0.625rem;
+            text-transform: uppercase;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .modal.open {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        /* Search Results */
+        .search-results {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .search-result-item {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-result-item:hover {
+            background: var(--light);
+            border-color: var(--primary);
+        }
+
+        .search-result-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .search-result-details {
+            font-size: 0.75rem;
+            color: var(--gray);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.625rem;
+            text-transform: uppercase;
+        }
+
+        .badge.usda {
+            background: var(--secondary);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 375px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 1.5rem;
+            background: var(--dark);
+            color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: var(--success);
+        }
+
+        .toast.error {
+            background: var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🥗 CalTrack</h1>
+            <div class="date-display" id="currentDate">Tuesday, September 30, 2025</div>
+        </div>
+
+        <!-- Daily Summary -->
+        <div class="daily-summary">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-label">Consumed</div>
+                    <div class="summary-value">1,245 <span class="summary-unit">cal</span></div>
+                </div>
+                <div class="summary-item burned">
+                    <div class="summary-label">Burned</div>
+                    <div class="summary-value">320 <span class="summary-unit">cal</span></div>
+                </div>
+                <div class="summary-item net">
+                    <div class="summary-label">Net</div>
+                    <div class="summary-value">925 <span class="summary-unit">cal</span></div>
+                </div>
+                <div class="summary-item goal">
+                    <div class="summary-label">Goal</div>
+                    <div class="summary-value">1,800 <span class="summary-unit">cal</span></div>
+                </div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-ring">
+                    <svg width="120" height="120">
+                        <circle cx="60" cy="60" r="50" fill="none" stroke="#e0e0e0" stroke-width="10"/>
+                        <circle class="progress-ring-circle" cx="60" cy="60" r="50" fill="none" stroke="#4CAF50" stroke-width="10"/>
+                    </svg>
+                    <div class="progress-text">
+                        <div class="progress-percent">69%</div>
+                        <div class="progress-label">of daily goal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search foods or activities..." id="mainSearch">
+                <span class="search-icon">🔍</span>
+            </div>
+            
+            <div class="quick-add-section">
+                <button class="quick-add-btn">🍳 Scrambled Eggs</button>
+                <button class="quick-add-btn">☕ Coffee</button>
+                <button class="quick-add-btn">🥛 Milk</button>
+                <button class="quick-add-btn">🍎 Apple</button>
+                <button class="quick-add-btn">🏃 Running</button>
+            </div>
+        </div>
+
+        <!-- Today's Entries -->
+        <div class="entries-section">
+            <div class="section-header">
+                <h2 class="section-title">Today's Entries</h2>
+                <span style="color: var(--primary); font-weight: bold;">1,245 cal</span>
+            </div>
+            
+            <div class="entry-item">
+                <div class="entry-info">
+                    <div class="entry-name">🍳 Scrambled Eggs</div>
+                    <div class="entry-details">Breakfast • 150g • <span class="entry-calories">220 cal</span></div>
+                </div>
+                <div class="entry-actions">
+                    <button class="icon-btn">✏️</button>
+                    <button class="icon-btn">🗑️</button>
+                </div>
+            </div>
+            
+            <div class="entry-item">
+                <div class="entry-info">
+                    <div class="entry-name">🥗 Caesar Salad</div>
+                    <div class="entry-details">Lunch • 250g • <span class="entry-calories">380 cal</span></div>
+                </div>
+                <div class="entry-actions">
+                    <button class="icon-btn">✏️</button>
+                    <button class="icon-btn">🗑️</button>
+                </div>
+            </div>
+            
+            <div class="entry-item">
+                <div class="entry-info">
+                    <div class="entry-name">🏃 Morning Run</div>
+                    <div class="entry-details">Activity • 30 min • <span class="entry-calories" style="color: var(--warning);">-280 cal</span></div>
+                </div>
+                <div class="entry-actions">
+                    <button class="icon-btn">✏️</button>
+                    <button class="icon-btn">🗑️</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weight Goals -->
+        <div class="goals-section">
+            <div class="section-header">
+                <h2 class="section-title">Weight Progress</h2>
+            </div>
+            
+            <div class="weight-display">
+                <div class="weight-card" onclick="openWeightModal('current')">
+                    <div class="weight-label">Current</div>
+                    <div class="weight-value">75.2 <span class="weight-unit">kg</span></div>
+                </div>
+                <div class="weight-card" onclick="openWeightModal('goal')">
+                    <div class="weight-label">Goal</div>
+                    <div class="weight-value">70.0 <span class="weight-unit">kg</span></div>
+                </div>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 65%;"></div>
+            </div>
+            
+            <div style="text-align: center; color: var(--gray); font-size: 0.875rem;">
+                5.2 kg to go • Est. completion: Dec 15, 2025
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="chart-section">
+            <div class="section-header">
+                <h2 class="section-title">Weekly Overview</h2>
+            </div>
+            <div class="chart-container">
+                <canvas id="weeklyChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Buttons -->
+    <div class="fab-container" id="fabContainer">
+        <button class="fab fab-weight" onclick="openWeightModal()">⚖️</button>
+        <button class="fab fab-activity" onclick="openActivityModal()">🏃</button>
+        <button class="fab fab-food" onclick="openFoodModal()">🍽️</button>
+        <button class="fab fab-main" onclick="toggleFab()">➕</button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-container">
+            <div class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Home</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Stats</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">🎯</span>
+                <span class="nav-label">Goals</span>
+            </div>
+            <div class="nav-item">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profile</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Food Entry Modal -->
+    <div class="modal" id="foodModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Food</h2>
+                <button class="modal-close" onclick="closeModal('foodModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Search Food Database</label>
+                    <input type="text" class="form-input" placeholder="Search USDA database or custom foods..." id="foodSearch">
+                </div>
+                
+                <div class="search-results" id="foodSearchResults">
+                    <div class="search-result-item">
+                        <div class="search-result-name">
+                            Chicken Breast, Grilled
+                            <span class="badge usda">USDA</span>
+                        </div>
+                        <div class="search-result-details">
+                            <span>165 cal/100g</span>
+                            <span>31g protein</span>
+                            <span>3.6g fat</span>
+                        </div>
+                    </div>
+                    <div class="search-result-item">
+                        <div class="search-result-name">
+                            Brown Rice, Cooked
+                            <span class="badge usda">USDA</span>
+                        </div>
+                        <div class="search-result-details">
+                            <span>112 cal/100g</span>
+                            <span>2.3g protein</span>
+                            <span>23.5g carbs</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Meal Type</label>
+                    <select class="form-select">
+                        <option>Breakfast</option>
+                        <option>Lunch</option>
+                        <option>Dinner</option>
+                        <option>Snack</option>
+                    </select>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" class="form-input" placeholder="100" value="100">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Unit</label>
+                        <select class="form-select">
+                            <option>grams</option>
+                            <option>oz</option>
+                            <option>cups</option>
+                            <option>pieces</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary btn-block">Add Food Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Entry Modal -->
+    <div class="modal" id="activityModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Activity</h2>
+                <button class="modal-close" onclick="closeModal('activityModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Activity Type</label>
+                    <select class="form-select" id="activityType">
+                        <option>Running (8 km/h)</option>
+                        <option>Walking (5 km/h)</option>
+                        <option>Cycling (20 km/h)</option>
+                        <option>Swimming</option>
+                        <option>Weight Training</option>
+                        <option>Yoga</option>
+                        <option>Custom...</option>
+                    </select>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Duration</label>
+                        <input type="number" class="form-input" placeholder="30" value="30">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Unit</label>
+                        <select class="form-select">
+                            <option>minutes</option>
+                            <option>hours</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Intensity</label>
+                    <select class="form-select">
+                        <option>Low</option>
+                        <option selected>Moderate</option>
+                        <option>High</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Notes (optional)</label>
+                    <input type="text" class="form-input" placeholder="Morning run in the park">
+                </div>
+                
+                <div style="padding: 1rem; background: var(--light); border-radius: var(--radius); margin-bottom: 1rem;">
+                    <div style="text-align: center; color: var(--gray); font-size: 0.875rem;">Estimated Calories Burned</div>
+                    <div style="text-align: center; font-size: 2rem; font-weight: bold; color: var(--warning);">280</div>
+                </div>
+                
+                <button class="btn btn-primary btn-block">Add Activity</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weight Entry Modal -->
+    <div class="modal" id="weightModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Update Weight</h2>
+                <button class="modal-close" onclick="closeModal('weightModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Weight Type</label>
+                    <select class="form-select" id="weightType">
+                        <option value="current">Current Weight</option>
+                        <option value="goal">Goal Weight</option>
+                    </select>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Weight</label>
+                        <input type="number" step="0.1" class="form-input" placeholder="75.0" id="weightValue">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Unit</label>
+                        <select class="form-select">
+                            <option>kg</option>
+                            <option>lbs</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="targetDateGroup" style="display: none;">
+                    <label class="form-label">Target Date</label>
+                    <input type="date" class="form-input" id="targetDate">
+                </div>
+                
+                <button class="btn btn-primary btn-block">Update Weight</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    
+    <script>
+        // Initialize date display
+        function updateDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date();
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+        }
+        updateDate();
+
+        // FAB toggle
+        function toggleFab() {
+            const container = document.getElementById('fabContainer');
+            container.classList.toggle('open');
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('open');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('open');
+        }
+
+        function openFoodModal() {
+            openModal('foodModal');
+            toggleFab();
+        }
+
+        function openActivityModal() {
+            openModal('activityModal');
+            toggleFab();
+        }
+
+        function openWeightModal(type = 'current') {
+            const modal = document.getElementById('weightModal');
+            const weightType = document.getElementById('weightType');
+            const targetDateGroup = document.getElementById('targetDateGroup');
+            
+            weightType.value = type;
+            targetDateGroup.style.display = type === 'goal' ? 'block' : 'none';
+            
+            openModal('weightModal');
+            if (document.getElementById('fabContainer').classList.contains('open')) {
+                toggleFab();
+            }
+        }
+
+        // Weight type change handler
+        document.getElementById('weightType').addEventListener('change', function(e) {
+            const targetDateGroup = document.getElementById('targetDateGroup');
+            targetDateGroup.style.display = e.target.value === 'goal' ? 'block' : 'none';
+        });
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Progress ring animation
+        function updateProgressRing(percent) {
+            const circle = document.querySelector('.progress-ring-circle');
+            const circumference = 2 * Math.PI * 50;
+            const offset = circumference - (percent / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+        }
+        updateProgressRing(69);
+
+        // Initialize Chart
+        const ctx = document.getElementById('weeklyChart').getContext('2d');
+        const weeklyChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [
+                    {
+                        label: 'Calories In',
+                        data: [1850, 1920, 1780, 2100, 1950, 2200, 1245],
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Calories Burned',
+                        data: [320, 450, 280, 520, 380, 200, 320],
+                        borderColor: '#ff9800',
+                        backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Weight (kg)',
+                        data: [76.0, 75.8, 75.7, 75.5, 75.4, 75.3, 75.2],
+                        borderColor: '#2196F3',
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        tension: 0.3,
+                        yAxisID: 'y1',
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true,
+                            font: {
+                                size: 11
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        cornerRadius: 8,
+                        displayColors: true
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Calories',
+                            font: {
+                                size: 10
+                            }
+                        },
+                        ticks: {
+                            font: {
+                                size: 10
+                            }
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Weight (kg)',
+                            font: {
+                                size: 10
+                            }
+                        },
+                        ticks: {
+                            font: {
+                                size: 10
+                            }
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Food search simulation
+        document.getElementById('foodSearch').addEventListener('input', function(e) {
+            // This would connect to the USDA API
+            console.log('Searching for:', e.target.value);
+        });
+
+        // Quick add buttons
+        document.querySelectorAll('.quick-add-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                showToast(`Added ${this.textContent} to today's log`);
+            });
+        });
+
+        // Entry action buttons
+        document.querySelectorAll('.icon-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (this.textContent === '🗑️') {
+                    showToast('Entry deleted', 'success');
+                }
+            });
+        });
+
+        // Bottom navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Close modal on background click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('open');
+                }
+            });
+        });
+
+        // Initialize the app
+        console.log('CalTrack initialized');
+    </script>
+</body>
+</html>

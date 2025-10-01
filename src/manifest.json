@@ -1,0 +1,12 @@
+{
+  "name": "CalTrack - Calorie & Activity Tracker",
+  "short_name": "CalTrack",
+  "description": "Track your calories, activities, and weight goals",
+  "theme_color": "#4CAF50",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/",
+  "scope": "/",
+  "icons": []
+}
