@@ -699,8 +699,8 @@ export class DashboardView {
             </div>
           </div>
           <div style="display: flex; gap: 0.25rem; align-items: center;">
-            <input type="number" class="quick-qty" data-index="${idx}" value="${Math.round(servingSize)}" min="1" style="width: 60px; padding: 0.25rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.75rem; text-align: center;">
-            <span style="font-size: 0.7rem; color: var(--gray);">g</span>
+            <input type="number" class="quick-qty" data-index="${idx}" value="${servingUnit === 'g' ? Math.round(servingSize) : '1'}" min="0.1" step="${servingUnit === 'g' ? '1' : '0.5'}" style="width: 60px; padding: 0.25rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.75rem; text-align: center;">
+            <span style="font-size: 0.7rem; color: var(--gray);">${servingUnit}</span>
             <button class="quick-add-btn" data-index="${idx}" style="padding: 0.25rem 0.5rem; background: var(--primary); color: white; border: none; border-radius: 4px; font-size: 0.7rem; cursor: pointer; white-space: nowrap;">Add</button>
           </div>
         </div>
@@ -770,7 +770,7 @@ export class DashboardView {
     }
   }
 
-  private async quickAddFood(food: FoodItem, quantityInGrams: number): Promise<void> {
+  private async quickAddFood(food: FoodItem, quantity: number): Promise<void> {
     // Save FatSecret food to local DB if needed
     if (food.data_source === 'fatsecret' && (!food.id || food.id === 0)) {
       const result = await apiClient.addFoodItem({
@@ -789,6 +789,13 @@ export class DashboardView {
     }
 
     try {
+      // Calculate actual quantity in grams for storage
+      // If unit is grams, use directly; otherwise multiply by serving size
+      const servingUnit = food.serving_size_unit || 'g';
+      const quantityInGrams = servingUnit.toLowerCase() === 'g'
+        ? quantity
+        : quantity * (food.serving_size_g || 100);
+
       const multiplier = quantityInGrams / 100;
       const calories = (food.calories_per_100g || 0) * multiplier;
       const protein = (food.protein_g || 0) * multiplier;
