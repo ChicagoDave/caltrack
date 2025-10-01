@@ -82,10 +82,10 @@ export class FatSecretFoodService {
     const sugarMatch = description.match(/Sugar:\s*([\d.]+)g/i);
     const sodiumMatch = description.match(/Sodium:\s*([\d.]+)mg/i);
 
-    // Parse serving size from description (e.g., "Per 100g" or "Per 1 serving" or "Per 1 cup")
-    const servingSizeMatch = description.match(/Per\s+([\d.]+)\s*(\w+)/i);
-    const servingAmount = servingSizeMatch ? parseFloat(servingSizeMatch[1]) : 100;
-    const servingUnit = servingSizeMatch ? servingSizeMatch[2] : 'g';
+    // Parse serving size from description (e.g., "Per 100g" or "Per 1 egg" or "Per 1 cup")
+    const servingSizeMatch = description.match(/Per\s+([\d.]+)\s*(.+?)\s*-/i);
+    const servingAmount = servingSizeMatch ? parseFloat(servingSizeMatch[1]) : 1;
+    const servingUnit = servingSizeMatch ? servingSizeMatch[2].trim() : 'serving';
 
     const calories = parseFloat(caloriesMatch?.[1] || '0');
     const protein = parseFloat(proteinMatch?.[1] || '0');
@@ -95,29 +95,9 @@ export class FatSecretFoodService {
     const sugar = parseFloat(sugarMatch?.[1] || '0');
     const sodium = parseFloat(sodiumMatch?.[1] || '0');
 
-    // If serving unit is grams, normalize to per 100g
-    // Otherwise, keep the values as-is for the serving size
-    let caloriesPer100g = calories;
-    let proteinPer100g = protein;
-    let carbsPer100g = carbs;
-    let fatPer100g = fat;
-    let fiberPer100g = fiber;
-    let sugarPer100g = sugar;
-    let sodiumPer100g = sodium;
-    let servingSizeG = servingAmount;
-
-    if (servingUnit.toLowerCase() === 'g') {
-      // Normalize to per 100g
-      const multiplier = 100 / servingAmount;
-      caloriesPer100g = calories * multiplier;
-      proteinPer100g = protein * multiplier;
-      carbsPer100g = carbs * multiplier;
-      fatPer100g = fat * multiplier;
-      fiberPer100g = fiber * multiplier;
-      sugarPer100g = sugar * multiplier;
-      sodiumPer100g = sodium * multiplier;
-      servingSizeG = 100;
-    }
+    // Store nutrition values PER SERVING (not normalized to 100g)
+    // This is the actual serving as reported by FatSecret
+    // For "1 egg" we store egg values, for "100g" we store 100g values
 
     // Format as "Brand - Item" for clarity
     const displayName = fsFood.brand_name
@@ -128,14 +108,14 @@ export class FatSecretFoodService {
       id: 0,
       name: displayName,
       brand: fsFood.brand_name || null,
-      calories_per_100g: Math.round(caloriesPer100g),
-      protein_g: Math.round(proteinPer100g * 10) / 10,
-      carbs_g: Math.round(carbsPer100g * 10) / 10,
-      fat_g: Math.round(fatPer100g * 10) / 10,
-      fiber_g: Math.round(fiberPer100g * 10) / 10,
-      sugar_g: Math.round(sugarPer100g * 10) / 10,
-      sodium_mg: Math.round(sodiumPer100g),
-      serving_size_g: servingSizeG,
+      calories_per_100g: Math.round(calories), // Misnomer: actually "per serving"
+      protein_g: Math.round(protein * 10) / 10,
+      carbs_g: Math.round(carbs * 10) / 10,
+      fat_g: Math.round(fat * 10) / 10,
+      fiber_g: Math.round(fiber * 10) / 10,
+      sugar_g: Math.round(sugar * 10) / 10,
+      sodium_mg: Math.round(sodium),
+      serving_size_g: servingAmount,
       serving_size_unit: servingUnit,
       user_id: null,
       is_custom: false,

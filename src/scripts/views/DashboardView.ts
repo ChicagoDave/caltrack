@@ -675,14 +675,18 @@ export class DashboardView {
       .slice(0, 50)
       .map(
         (food, idx) => {
-          // Calculate nutrition for actual serving size
-          const servingSize = food.serving_size_g || 100;
-          const multiplier = servingSize / 100;
-          const servingCals = Math.round(food.calories_per_100g * multiplier);
-          const servingProtein = ((food.protein_g || 0) * multiplier).toFixed(1);
-          const servingCarbs = ((food.carbs_g || 0) * multiplier).toFixed(1);
-          const servingFat = ((food.fat_g || 0) * multiplier).toFixed(1);
+          // FoodItem stores nutrition PER SERVING (not per 100g despite field name)
+          const servingSize = food.serving_size_g || 1;
           const servingUnit = food.serving_size_unit || 'serving';
+
+          // Display nutrition for ONE serving
+          const servingCals = Math.round(food.calories_per_100g);
+          const servingProtein = (food.protein_g || 0).toFixed(1);
+          const servingCarbs = (food.carbs_g || 0).toFixed(1);
+          const servingFat = (food.fat_g || 0).toFixed(1);
+
+          // Format serving display (e.g., "1 egg", "100 g", "1 serving")
+          const servingDisplay = servingSize === 1 ? servingUnit : `${servingSize} ${servingUnit}`;
 
           return `
         <div class="food-result" data-food='${JSON.stringify(food).replace(/'/g, "&apos;")}' data-index="${idx}" style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
@@ -692,15 +696,15 @@ export class DashboardView {
               ${food.data_source === 'fatsecret' ? '<span style="display: inline-block; padding: 0.125rem 0.375rem; background: var(--secondary); color: white; border-radius: 8px; font-size: 0.6rem; text-transform: uppercase; margin-left: 0.375rem;">FS</span>' : ''}
             </div>
             <div style="font-size: 0.7rem; color: var(--gray); display: flex; gap: 0.75rem;">
-              <span>${servingCals} cal/${servingUnit}</span>
+              <span>${servingCals} cal/${servingDisplay}</span>
               ${food.protein_g ? `<span>P:${servingProtein}g</span>` : ''}
               ${food.carbs_g ? `<span>C:${servingCarbs}g</span>` : ''}
               ${food.fat_g ? `<span>F:${servingFat}g</span>` : ''}
             </div>
           </div>
           <div style="display: flex; gap: 0.25rem; align-items: center;">
-            <input type="number" class="quick-qty" data-index="${idx}" value="${servingUnit === 'g' ? Math.round(servingSize) : '1'}" min="0.1" step="${servingUnit === 'g' ? '1' : '0.5'}" style="width: 60px; padding: 0.25rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.75rem; text-align: center;">
-            <span style="font-size: 0.7rem; color: var(--gray);">${servingUnit}</span>
+            <input type="number" class="quick-qty" data-index="${idx}" value="1" min="0.5" step="0.5" style="width: 50px; padding: 0.25rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.75rem; text-align: center;">
+            <span style="font-size: 0.7rem; color: var(--gray); min-width: 30px;">×</span>
             <button class="quick-add-btn" data-index="${idx}" style="padding: 0.25rem 0.5rem; background: var(--primary); color: white; border: none; border-radius: 4px; font-size: 0.7rem; cursor: pointer; white-space: nowrap;">Add</button>
           </div>
         </div>
@@ -770,7 +774,7 @@ export class DashboardView {
     }
   }
 
-  private async quickAddFood(food: FoodItem, quantity: number): Promise<void> {
+  private async quickAddFood(food: FoodItem, servingMultiplier: number): Promise<void> {
     // Save FatSecret food to local DB if needed
     if (food.data_source === 'fatsecret' && (!food.id || food.id === 0)) {
       const result = await apiClient.addFoodItem({
@@ -789,19 +793,17 @@ export class DashboardView {
     }
 
     try {
-      // Calculate actual quantity in grams for storage
-      // If unit is grams, use directly; otherwise multiply by serving size
-      const servingUnit = food.serving_size_unit || 'g';
-      const quantityInGrams = servingUnit.toLowerCase() === 'g'
-        ? quantity
-        : quantity * (food.serving_size_g || 100);
+      // Food items store nutrition PER SERVING
+      // Multiply by servingMultiplier (e.g., 4 servings = 4×)
+      const calories = (food.calories_per_100g || 0) * servingMultiplier;
+      const protein = (food.protein_g || 0) * servingMultiplier;
+      const carbs = (food.carbs_g || 0) * servingMultiplier;
+      const fat = (food.fat_g || 0) * servingMultiplier;
+      const fiber = (food.fiber_g || 0) * servingMultiplier;
 
-      const multiplier = quantityInGrams / 100;
-      const calories = (food.calories_per_100g || 0) * multiplier;
-      const protein = (food.protein_g || 0) * multiplier;
-      const carbs = (food.carbs_g || 0) * multiplier;
-      const fat = (food.fat_g || 0) * multiplier;
-      const fiber = (food.fiber_g || 0) * multiplier;
+      // For quantity_g, we'll store a nominal value (servings × serving_size_g)
+      // This maintains compatibility with the database schema
+      const quantityInGrams = servingMultiplier * (food.serving_size_g || 100);
 
       const dateStr = format(this.state.currentDate, 'yyyy-MM-dd');
 
