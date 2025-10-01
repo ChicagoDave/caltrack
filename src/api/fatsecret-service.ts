@@ -97,9 +97,9 @@ export class FatSecretFoodService {
     const sugar = parseFloat(sugarMatch?.[1] || '0');
     const sodium = parseFloat(sodiumMatch?.[1] || '0');
 
-    // Include brand in the name for better searchability
+    // Format as "Brand - Item" for clarity
     const displayName = fsFood.brand_name
-      ? `${fsFood.food_name} (${fsFood.brand_name})`
+      ? `${fsFood.brand_name} - ${fsFood.food_name}`
       : fsFood.food_name;
 
     return {
