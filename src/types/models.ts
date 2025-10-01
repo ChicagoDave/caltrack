@@ -47,9 +47,9 @@ export interface FoodItem {
   serving_size_unit?: string;
   user_id?: number | null;
   is_custom: boolean;
-  fdc_id?: string | null;  // USDA FoodData Central ID
+  fdc_id?: string | null;  // FatSecret food ID
   barcode?: string | null;
-  data_source?: 'usda' | 'nutritionix' | 'custom' | 'verified';
+  data_source?: 'fatsecret' | 'custom' | 'verified';
   last_synced?: Date;
 }
 
@@ -175,9 +175,9 @@ export interface UserRegistrationData {
 
 export interface SearchFilters {
   query: string;
-  includeUSDA: boolean;
+  includeFatSecret: boolean;
   includeCustom: boolean;
-  dataSource?: 'all' | 'usda' | 'custom';
+  dataSource?: 'all' | 'fatsecret' | 'custom';
   category?: string;
   minCalories?: number;
   maxCalories?: number;

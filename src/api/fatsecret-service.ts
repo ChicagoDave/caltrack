@@ -119,7 +119,7 @@ export class FatSecretFoodService {
       is_custom: false,
       fdc_id: fsFood.food_id,
       barcode: null,
-      data_source: 'usda',
+      data_source: 'fatsecret',
       last_synced: new Date(),
     };
   }

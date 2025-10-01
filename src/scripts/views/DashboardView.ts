@@ -689,7 +689,7 @@ export class DashboardView {
           <div style="flex: 1; cursor: pointer;" class="food-info">
             <div style="font-weight: 500; margin-bottom: 0.125rem; font-size: 0.875rem;">
               ${food.name}
-              ${food.data_source === 'usda' ? '<span style="display: inline-block; padding: 0.125rem 0.375rem; background: var(--secondary); color: white; border-radius: 8px; font-size: 0.6rem; text-transform: uppercase; margin-left: 0.375rem;">FS</span>' : ''}
+              ${food.data_source === 'fatsecret' ? '<span style="display: inline-block; padding: 0.125rem 0.375rem; background: var(--secondary); color: white; border-radius: 8px; font-size: 0.6rem; text-transform: uppercase; margin-left: 0.375rem;">FS</span>' : ''}
             </div>
             <div style="font-size: 0.7rem; color: var(--gray); display: flex; gap: 0.75rem;">
               <span>${servingCals} cal/${servingUnit}</span>
@@ -738,7 +738,7 @@ export class DashboardView {
   }
 
   private async selectFood(food: FoodItem): Promise<void> {
-    if ((food.data_source === 'nutritionix' || food.data_source === 'usda') && (!food.id || food.id === 0)) {
+    if (food.data_source === 'fatsecret' && (!food.id || food.id === 0)) {
       const result = await apiClient.addFoodItem({
         name: food.name,
         brand: food.brand,
@@ -771,8 +771,8 @@ export class DashboardView {
   }
 
   private async quickAddFood(food: FoodItem, quantityInGrams: number): Promise<void> {
-    // Save Nutritionix food to local DB if needed
-    if ((food.data_source === 'nutritionix' || food.data_source === 'usda') && (!food.id || food.id === 0)) {
+    // Save FatSecret food to local DB if needed
+    if (food.data_source === 'fatsecret' && (!food.id || food.id === 0)) {
       const result = await apiClient.addFoodItem({
         name: food.name,
         brand: food.brand,
